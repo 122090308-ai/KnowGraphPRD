@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KnowGraph · 产品需求文档 PRD v0.2</title>
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --surface: #ffffff;
+    --surface2: #f0f2f9;
+    --accent: #5b5bd6;
+    --accent2: #7c6ff7;
+    --accent3: #0ea5e9;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --text: #1e2235;
+    --muted: #64748b;
+    --border: #e2e5f0;
+    --radius: 12px;
+    --font: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+    --shadow: 0 1px 4px rgba(91,91,214,0.07), 0 4px 16px rgba(91,91,214,0.04);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  /* ── TOP NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+    background: rgba(255,255,255,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; height: 56px;
+    box-shadow: 0 1px 8px rgba(91,91,214,0.08);
+  }
+  nav .logo { font-size: 18px; font-weight: 800; color: var(--accent); letter-spacing: 0.5px; }
+  nav .logo span { color: var(--accent3); }
+  nav .nav-links { display: flex; gap: 24px; }
+  nav .nav-links a {
+    color: var(--muted); text-decoration: none; font-size: 13px;
+    transition: color .2s;
+  }
+  nav .nav-links a:hover { color: var(--text); }
+  .badge-nav {
+    background: var(--accent); color: #fff; font-size: 11px;
+    padding: 2px 8px; border-radius: 20px; margin-left: 8px;
+  }
+
+  /* ── SIDEBAR ── */
+  .layout { display: flex; margin-top: 56px; }
+  .sidebar {
+    width: 240px; min-height: calc(100vh - 56px);
+    position: sticky; top: 56px; align-self: flex-start;
+    padding: 24px 0; border-right: 1px solid var(--border);
+    background: var(--surface);
+    overflow-y: auto; max-height: calc(100vh - 56px);
+  }
+  .sidebar-section { margin-bottom: 8px; }
+  .sidebar-title {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--muted); padding: 8px 20px 4px;
+  }
+  .sidebar a {
+    display: block; padding: 7px 20px;
+    color: var(--muted); text-decoration: none; font-size: 13px;
+    border-left: 3px solid transparent;
+    transition: all .2s;
+  }
+  .sidebar a:hover, .sidebar a.active {
+    color: var(--accent); border-left-color: var(--accent);
+    background: rgba(91,91,214,0.05);
+  }
+
+  /* ── MAIN ── */
+  .main { flex: 1; padding: 48px 56px 80px; max-width: 1000px; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #ededfc 0%, #e8f0fe 50%, #dff3fb 100%);
+    border: 1px solid #d4d4f7;
+    border-radius: var(--radius);
+    padding: 48px 40px;
+    margin-bottom: 48px;
+    position: relative; overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -60px; right: -60px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(91,91,214,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(91,91,214,0.1); color: var(--accent);
+    font-size: 12px; padding: 4px 12px; border-radius: 20px;
+    border: 1px solid rgba(91,91,214,0.25); margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-size: 36px; font-weight: 800; line-height: 1.2;
+    color: var(--text); margin-bottom: 12px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero p { color: var(--muted); font-size: 16px; max-width: 540px; }
+  .hero-meta {
+    display: flex; gap: 24px; margin-top: 24px; flex-wrap: wrap;
+  }
+  .hero-meta-item { display: flex; align-items: center; gap: 8px; }
+  .hero-meta-item .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .hero-meta-item span { font-size: 13px; color: var(--muted); }
+  .hero-meta-item strong { color: var(--text); }
+
+  /* ── SECTIONS ── */
+  .section { margin-bottom: 56px; scroll-margin-top: 80px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 24px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  h2 { font-size: 22px; font-weight: 700; color: var(--text); }
+  h3 { font-size: 16px; font-weight: 600; color: var(--accent); margin: 20px 0 10px; }
+  h4 { font-size: 14px; font-weight: 600; color: var(--text); margin: 14px 0 6px; }
+  p { color: var(--muted); margin-bottom: 12px; }
+  strong { color: var(--text); }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .card-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px; margin-bottom: 16px;
+  }
+  .card-grid .card { margin-bottom: 0; }
+  .card-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .card-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .card-icon { font-size: 24px; margin-bottom: 10px; }
+
+  /* ── HIGHLIGHT BOXES ── */
+  .highlight {
+    border-left: 3px solid var(--accent);
+    background: rgba(91,91,214,0.05);
+    padding: 14px 18px; border-radius: 0 8px 8px 0;
+    margin: 16px 0; font-size: 14px; color: var(--text);
+  }
+  .highlight.green {
+    border-left-color: var(--green);
+    background: rgba(16,185,129,0.05);
+  }
+  .highlight.yellow {
+    border-left-color: var(--yellow);
+    background: rgba(245,158,11,0.05);
+  }
+  .highlight.blue {
+    border-left-color: var(--accent3);
+    background: rgba(14,165,233,0.06);
+  }
+
+  /* ── TABLES ── */
+  .table-wrap { overflow-x: auto; margin: 16px 0; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; background: var(--surface); }
+  thead th {
+    background: var(--surface2); color: var(--accent);
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; padding: 12px 16px; text-align: left;
+    white-space: nowrap;
+  }
+  tbody td { padding: 11px 16px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted); }
+  tbody tr:hover td { background: var(--surface2); }
+  .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 6px;
+    font-size: 11px; font-weight: 600; white-space: nowrap;
+  }
+  .tag.high { background: rgba(239,68,68,0.1); color: var(--red); }
+  .tag.mid { background: rgba(245,158,11,0.1); color: var(--yellow); }
+  .tag.low { background: rgba(16,185,129,0.1); color: var(--green); }
+  .tag.accent { background: rgba(91,91,214,0.1); color: var(--accent); }
+  .tag.blue { background: rgba(14,165,233,0.1); color: var(--accent3); }
+
+  /* ── TIMELINE ── */
+  .timeline { position: relative; padding-left: 24px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 6px; top: 0; bottom: 0;
+    width: 2px; background: linear-gradient(to bottom, var(--accent), transparent);
+  }
+  .timeline-item { position: relative; margin-bottom: 28px; }
+  .timeline-item::before {
+    content: ''; position: absolute; left: -20px; top: 5px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 8px rgba(91,91,214,0.4);
+  }
+  .timeline-phase {
+    font-size: 11px; font-weight: 600; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
+  }
+  .timeline-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .timeline-desc { font-size: 13px; color: var(--muted); }
+
+  /* ── USER JOURNEY ── */
+  .journey {
+    display: flex; gap: 0; overflow-x: auto; padding: 4px 0 12px;
+  }
+  .journey-step {
+    flex-shrink: 0; width: 140px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px; text-align: center;
+    position: relative; box-shadow: var(--shadow);
+  }
+  .journey-step + .journey-step { margin-left: 10px; }
+  .journey-step::after {
+    content: '→';
+    position: absolute; right: -14px; top: 50%; transform: translateY(-50%);
+    color: var(--accent); font-size: 16px; z-index: 1;
+  }
+  .journey-step:last-child::after { display: none; }
+  .journey-icon { font-size: 22px; margin-bottom: 6px; }
+  .journey-label { font-size: 12px; color: var(--muted); }
+  .journey-action { font-size: 11px; color: var(--accent); margin-top: 4px; font-weight: 600; }
+
+  /* ── FEATURE LIST ── */
+  .feature-list { list-style: none; }
+  .feature-list li {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    font-size: 14px; color: var(--muted);
+  }
+  .feature-list li:last-child { border-bottom: none; }
+  .feature-list li .check { color: var(--green); flex-shrink: 0; margin-top: 2px; }
+  .feature-list li strong { color: var(--text); }
+
+  /* ── COMPETITOR ── */
+  .comp-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  .comp-card {
+    flex: 1; min-width: 180px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow);
+  }
+  .comp-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .comp-type { font-size: 11px; color: var(--accent); margin-bottom: 8px; }
+  .comp-pros, .comp-cons { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .comp-gap { font-size: 12px; color: var(--yellow); margin-top: 6px; }
+
+  /* ── METRICS ── */
+  .metrics-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+  .metric-card {
+    flex: 1; min-width: 140px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 20px;
+    text-align: center; box-shadow: var(--shadow);
+  }
+  .metric-val { font-size: 28px; font-weight: 800; color: var(--accent); }
+  .metric-unit { font-size: 13px; color: var(--accent); font-weight: 600; }
+  .metric-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* ── PERSONA ── */
+  .persona-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .persona-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  }
+  .persona-avatar { font-size: 32px; margin-bottom: 8px; }
+  .persona-name { font-size: 16px; font-weight: 700; color: var(--text); }
+  .persona-role { font-size: 12px; color: var(--accent); margin-bottom: 10px; }
+  .persona-quote {
+    font-style: italic; font-size: 13px; color: var(--muted);
+    border-left: 2px solid var(--accent); padding: 8px 10px;
+    background: rgba(91,91,214,0.04); border-radius: 0 6px 6px 0; margin: 10px 0;
+  }
+  .persona-pain { font-size: 13px; color: var(--muted); }
+  .pain-item { margin-bottom: 4px; }
+  .pain-item::before { content: '⚡ '; }
+
+  /* ── ARCH DIAGRAM ── */
+  .arch {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px;
+    margin: 16px 0; box-shadow: var(--shadow);
+  }
+  .arch-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
+  .arch-box {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 16px;
+    font-size: 12px; color: var(--text); text-align: center;
+    min-width: 100px;
+  }
+  .arch-box.accent { border-color: var(--accent); background: rgba(91,91,214,0.07); color: var(--accent); font-weight: 600; }
+  .arch-box.green { border-color: var(--green); background: rgba(16,185,129,0.07); color: var(--green); font-weight: 600; }
+  .arch-box.blue { border-color: var(--accent3); background: rgba(14,165,233,0.07); color: var(--accent3); font-weight: 600; }
+  .arch-arrow { text-align: center; color: var(--muted); font-size: 20px; margin: 4px 0; }
+  .arch-label { text-align: center; font-size: 11px; color: var(--muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── PRICING ── */
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .pricing-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px; text-align: center; box-shadow: var(--shadow);
+  }
+  .pricing-card.featured {
+    border-color: var(--accent); background: rgba(91,91,214,0.04);
+    box-shadow: 0 0 0 2px rgba(91,91,214,0.15), var(--shadow);
+  }
+  .pricing-name { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+  .pricing-price { font-size: 32px; font-weight: 800; color: var(--text); }
+  .pricing-price sup { font-size: 16px; vertical-align: top; margin-top: 6px; }
+  .pricing-unit { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+  .pricing-features { text-align: left; list-style: none; }
+  .pricing-features li { padding: 5px 0; font-size: 13px; color: var(--muted); border-bottom: 1px solid var(--border); }
+  .pricing-features li:last-child { border-bottom: none; }
+  .pricing-features li::before { content: '✓ '; color: var(--green); }
+
+  /* ── RISK ── */
+  .risk-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .risk-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 20px; box-shadow: var(--shadow);
+  }
+  .risk-level { font-size: 11px; font-weight: 600; margin-bottom: 6px; }
+  .risk-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .risk-desc { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .risk-counter { font-size: 12px; color: var(--green); }
+  .risk-counter::before { content: '→ '; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { padding: 32px 20px 60px; }
+    .persona-grid, .pricing-grid, .risk-row { grid-template-columns: 1fr; }
+    nav .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Know<span>Graph</span></div>
+  <div class="nav-links">
+    <a href="#overview">概览</a>
+    <a href="#market">市场</a>
+    <a href="#product">产品</a>
+    <a href="#features">功能</a>
+    <a href="#tech">技术</a>
+    <a href="#roadmap">路线</a>
+    <a href="#biz">商业</a>
+    <span class="badge-nav">PRD v0.1</span>
+  </div>
+</nav>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-title">文档信息</div>
+    <a href="#overview">01 · 产品概述</a>
+    <a href="#market">02 · 市场分析</a>
+    <a href="#verticals">03 · 垂类机会</a>
+    <a href="#persona">04 · 目标用户</a>
+    <a href="#competitor">05 · 竞品分析</a>
+    <a href="#product">06 · 产品定位</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-title">功能规划</div>
+    <a href="#features">07 · 核心功能</a>
+    <a href="#userflow">08 · 用户旅程</a>
+    <a href="#tech">09 · 技术架构</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-title">商业规划</div>
+    <a href="#roadmap">10 · 迭代路线</a>
+    <a href="#biz">11 · 商业模式</a>
+    <a href="#risk">12 · 风险评估</a>
+    <a href="#success">13 · 成功指标</a>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">Product Requirements Document · v0.2 · Draft</div>
+    <h1>Know<span>Graph</span></h1>
+    <p>面向知识型内容创作者的多模态知识图谱 SaaS 平台——把博主每一场直播、每一篇图文，织成一张会说话的知识网络，让粉丝和博主的连接更聪明、更高效。</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <div class="dot" style="background:var(--accent)"></div>
+        <span>更新时间：<strong>2026-03-31</strong></span>
+      </div>
+      <div class="hero-meta-item">
+        <div class="dot" style="background:var(--green)"></div>
+        <span>状态：<strong>概念验证阶段</strong></span>
+      </div>
+      <div class="hero-meta-item">
+        <div class="dot" style="background:var(--yellow)"></div>
+        <span>目标客群：<strong>留学 · 职场 · 技能培训博主</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 01 概述 ── -->
+  <section class="section" id="overview">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <h2>产品概述</h2>
+    </div>
+
+    <div class="highlight blue">
+      <strong>一句话定义：</strong>KnowGraph 是一款面向知识型内容创作者（<strong>留学博主、职场技能博主、直播电商达人</strong>等小B群体）的 <strong>多模态知识图谱 SaaS 产品</strong>，帮助他们将历次直播、短视频、图文等内容自动构建成结构化知识图谱，并对外提供可嵌入微信生态的 AI 问答智能体，让用户在联系博主本人之前，先与"图谱"完成高质量的初级咨询。
+    </div>
+
+    <h3>核心价值主张</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">🧠</div>
+        <div class="card-title">内容不再沉睡</div>
+        <div class="card-desc">过去直播讲过的每一句话，都变成可检索、可引用的知识节点，而非躺在回放里无人问津。</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">博主时间解放</div>
+        <div class="card-desc">用户的 80% 重复问题由图谱 AI 回答，博主专注高价值的深度咨询和内容创作。</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔗</div>
+        <div class="card-title">微信生态原生</div>
+        <div class="card-desc">无缝接入微信视频号流量池，公域内容引流 → 私域图谱沉淀 → AI 首筛 → 博主转化，闭环完整。</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <div class="card-title">内容越用越聪明</div>
+        <div class="card-desc">基于 GraphRAG，知识节点随每次新直播/图文自动扩充关联，图谱随时间越来越完备。</div>
+      </div>
+    </div>
+
+    <h3>产品命名说明</h3>
+    <p>工作名：<strong>KnowGraph</strong>（知识 + 图谱）。面向 C 端用户可呈现为"[博主名]的知识星球"或"[博主名]AI助理"等白标品牌化名称。</p>
+  </section>
+
+  <!-- ── 02 市场分析 ── -->
+  <section class="section" id="market">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <h2>市场分析</h2>
+    </div>
+
+    <h3>宏观市场规模</h3>
+    <div class="metrics-row">
+      <div class="metric-card">
+        <div class="metric-val">1200<span class="metric-unit">亿</span></div>
+        <div class="metric-label">2024年中国知识付费市场规模</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val">3500<span class="metric-unit">亿</span></div>
+        <div class="metric-label">预计2030年规模（30%+年增）</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val">5<span class="metric-unit">亿+</span></div>
+        <div class="metric-label">微信视频号月活跃用户</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val">67<span class="metric-unit">%</span></div>
+        <div class="metric-label">视频号创作者同比增速（2025）</div>
+      </div>
+    </div>
+
+    <h3>这是真需求吗？</h3>
+    <div class="card">
+      <div class="card-desc">
+        <p>在判断市场机会前，必须区分博主的<strong>真需求</strong>和<strong>假需求</strong>：</p>
+        <ul style="padding-left:20px;margin-top:8px;line-height:2.2;color:var(--muted)">
+          <li><strong style="color:var(--red)">❌ 假需求</strong>：博主想要"一个漂亮的知识图谱"——他们不在乎图谱本身，那不是他们的目标</li>
+          <li><strong style="color:var(--green)">✅ 真需求</strong>：博主想要"一个能替我回答重复问题、帮粉丝决策后下单咨询的工具"</li>
+        </ul>
+        <p style="margin-top:12px"><strong>知识图谱是技术手段，博主省时间、提高转化率才是目标。</strong> 只要 KnowGraph 让博主每天少回 100 条重复问题，或让粉丝咨询转付费的比例从 5% 提升到 10%，博主就会掏钱。</p>
+      </div>
+    </div>
+
+    <h3>博主真实痛点验证</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>痛点</th><th>真实程度</th><th>现有替代方案</th><th>KnowGraph 的机会</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>重复回答同一个问题</strong></td><td><span class="tag low">真实、极普遍</span></td><td>FAQ置顶、关键词回复</td><td>图谱AI自动回答，附溯源，质量更高</td></tr>
+          <tr><td><strong>内容量大但价值未沉淀</strong></td><td><span class="tag low">真实，但博主未必感知</span></td><td>几乎没有好方案 ⬅</td><td><strong style="color:var(--accent)">核心机会所在</strong></td></tr>
+          <tr><td><strong>流量→咨询转化率低</strong></td><td><span class="tag low">真实、极痛</span></td><td>知识星球、小鹅通</td><td>图谱降低决策门槛，提升付费意愿</td></tr>
+          <tr><td><strong>直播内容散乱、用户找不到</strong></td><td><span class="tag mid">真实但低频</span></td><td>做合集、发小册子</td><td>图谱可视化导航，用户自助检索</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight">
+      <strong>核心竞争壁垒：</strong>KnowGraph 的护城河不在技术本身（Dify/Coze 今天就能搭建 RAG），而在<strong>垂直领域的数据飞轮</strong>——用的博主越多，图谱质量越高，C 端用户体验越好，新博主越愿意入驻。冷启动策略决定成败，技术只是基础门票。
+    </div>
+
+    <h3>市场时机判断</h3>
+    <div class="highlight green">
+      <strong>窗口期正在打开：</strong>2025 年多模态 RAG 框架（VideoRAG、ColQwen 等）技术已成熟可用；微信视频号生态处于流量红利期（创作者同比激增 67%，中腰部变现率却不足 30%）；知识付费市场从公域向私域深耕演进。三者叠加，KnowGraph 切入时机恰当。
+    </div>
+  </section>
+
+  <!-- ── 03 垂类机会 ── -->
+  <section class="section" id="verticals">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <h2>垂类市场机会分析</h2>
+    </div>
+
+    <p>基于真实痛点分析与商业逻辑研判，KnowGraph 优先布局三大垂类，采用阶段性推进策略：</p>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;box-shadow:var(--shadow);border-top:3px solid var(--accent)">
+      <div style="display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-bottom:10px;background:rgba(91,91,214,.1);color:var(--accent)">🥇 优先级 1 · 冷启动首发</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px">🎓 留学 / 升学博主</div>
+      <p>中国出境留学市场 2024 年服务人次超 <strong>86 万</strong>（同比 +12.4%），咨询客单价高达 <strong>5,000–50,000 元</strong>。三大核心痛点叠加：① 每场直播重复回答相同问题；② 粉丝找不到低门槛切入点；③ 内容生产量大但旧内容价值归零。</p>
+      <p><strong>选择理由：</strong>痛点最尖锐、内容高度结构化、博主有付费能力、用户决策周期长（愿意深度交互）。是最理想的冷启动场景，先打透再扩展。</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+        <span style="font-size:11px;padding:3px 8px;border-radius:20px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)">高客单价 5K-5W</span>
+        <span style="font-size:11px;padding:3px 8px;border-radius:20px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)">内容高度结构化</span>
+        <span style="font-size:11px;padding:3px 8px;border-radius:20px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)">用户深度交互</span>
+        <span style="font-size:11px;padding:3px 8px;border-radius:20px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)">痛点极度尖锐</span>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;box-shadow:var(--shadow);border-top:3px solid var(--green)">
+      <div style="display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-bottom:10px;background:rgba(16,185,129,.1);color:var(--green)">🥈 优先级 2 · 6个月后扩展</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px">💼 职场 / 技能培训博主</div>
+      <p>职场赛道是知识付费变现能力最强的品类。与留学博主相比三个明显优势：<strong>复购率更高</strong>（职场提升是持续需求）、<strong>内容更标准化</strong>（面试技巧/简历写法比申请哈佛更容易结构化）、<strong>付费意愿最强</strong>（知识付费行业职场类用户付费转化率最高）。</p>
+      <p><strong>典型客户：</strong>职场博主（Excel/产品经理/HR）、考证培训（CPA/法考/建造师）、大厂晋升方法论博主。</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+        <span style="font-size:11px;padding:3px 8px;border-radius:20px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)">高复购率</span>
+        <span style="font-size:11px;padding:3px 8px;border-radius:20px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)">内容易结构化</span>
+        <span style="font-size:11px;padding:3px 8px;border-radius:20px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)">付费意愿最强</span>
+        <span style="font-size:11px;padding:3px 8px;border-radius:20px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)">亿级市场规模</span>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;box-shadow:var(--shadow);border-top:3px solid var(--yellow)">
+      <div style="display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-bottom:10px;background:rgba(245,158,11,.1);color:var(--yellow)">🥉 优先级 3 · 差异化打法</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px">🛍️ 直播电商达人</div>
+      <p>电商达人的知识库需求与前两者不同——核心是<strong>选品逻辑、话术沉淀、产品知识管理</strong>，而非粉丝深度问答。主播团队话术积累、选品知识库、产品参数问答自动化都是适合图谱化的场景。</p>
+      <p><strong>注意：</strong>电商用户关系比留学用户浅，粉丝不会花10分钟深度交互，需要把对话设计得更轻、更快、更购物导向，需要产品交互特化。</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+        <span style="font-size:11px;padding:3px 8px;border-radius:20px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)">市场规模极大</span>
+        <span style="font-size:11px;padding:3px 8px;border-radius:20px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)">话术/选品知识沉淀</span>
+        <span style="font-size:11px;padding:3px 8px;border-radius:20px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)">需特化交互设计</span>
+      </div>
+    </div>
+
+    <h3>三大垂类横向对比</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>维度</th><th>🎓 留学/升学</th><th>💼 职场/技能</th><th>🛍️ 直播电商</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>痛点尖锐度</td><td><span class="tag low">★★★★★ 最强</span></td><td><span class="tag accent">★★★★ 强</span></td><td><span class="tag mid">★★★ 中</span></td></tr>
+          <tr><td>客单价</td><td>5K–5W 元</td><td>500–5000 元</td><td>低，走量</td></tr>
+          <tr><td>复购频率</td><td><span class="tag mid">一次性</span></td><td><span class="tag low">高，持续</span></td><td>中，商品复购</td></tr>
+          <tr><td>内容结构化难度</td><td><span class="tag low">低，逻辑清晰</span></td><td><span class="tag low">低，高度标准化</span></td><td><span class="tag mid">中，话术灵活</span></td></tr>
+          <tr><td>用户深度交互意愿</td><td><span class="tag low">极高</span></td><td><span class="tag low">高</span></td><td><span class="tag mid">低，求快</span></td></tr>
+          <tr><td>推荐切入时间</td><td><span class="tag accent">Phase 0 立即</span></td><td><span class="tag mid">Phase 2（6个月）</span></td><td><span class="tag mid">Phase 2-3（12个月）</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight green">
+      <strong>策略结论：</strong>留学赛道是最佳冷启动场景（痛点最尖锐、最容易证明价值），职场赛道是最大长期市场（复购高、规模大），两者组合是最优路径。电商作为第三曲线，需要差异化产品设计。
+    </div>
+  </section>
+
+  <!-- ── 04 目标用户 ── -->
+  <section class="section" id="persona">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <h2>目标用户画像</h2>
+    </div>
+
+    <div class="persona-grid">
+      <div class="persona-card">
+        <div class="persona-avatar">👩‍🎓</div>
+        <div class="persona-name">小鹿学姐</div>
+        <div class="persona-role">🎓 留学博主 · 微信视频号 8 万粉 · 英美研究生申请</div>
+        <div class="persona-quote">"每天私信爆炸，都在问一样的问题，我根本回不过来，但又不敢不回——流量就是信任。"</div>
+        <div class="persona-pain">
+          <div class="pain-item">每月花 40h+ 回复重复私信，精力耗尽</div>
+          <div class="pain-item">直播回放没人看，内容价值白白流失</div>
+          <div class="pain-item">想卖高客单咨询，但粉丝转化漏斗太浅</div>
+          <div class="pain-item">团队只有1-2人，无力做内容系统化</div>
+        </div>
+      </div>
+      <div class="persona-card">
+        <div class="persona-avatar">👨‍💻</div>
+        <div class="persona-name">Mark 聊职场</div>
+        <div class="persona-role">💼 职场技能博主 · 双平台 20 万粉 · 互联网大厂/产品方向</div>
+        <div class="persona-quote">"我录了200期节目，知识体系很全，但观众只是零散地看，没法形成整体认知，根本转化不了付费课。"</div>
+        <div class="persona-pain">
+          <div class="pain-item">内容碎片化，用户难以系统学习</div>
+          <div class="pain-item">想做付费社群，但没有合适工具承接</div>
+          <div class="pain-item">知识检索靠粉丝翻历史，体验极差</div>
+          <div class="pain-item">大量重复问题（面试/简历/跳槽时机）</div>
+        </div>
+      </div>
+      <div class="persona-card">
+        <div class="persona-avatar">👩‍🏫</div>
+        <div class="persona-name">萌萌考证说</div>
+        <div class="persona-role">📚 技能培训博主 · CPA/法考方向 · 5 万粉付费社群</div>
+        <div class="persona-quote">"学员每次问我要哪个章节的解题技巧，我都要翻好久直播录像，太耗时间了，而且还不一定找得到。"</div>
+        <div class="persona-pain">
+          <div class="pain-item">考点知识散落在数百场直播中</div>
+          <div class="pain-item">学员反复问同类题型和考点解析</div>
+          <div class="pain-item">直播知识与题库没有形成体系关联</div>
+          <div class="pain-item">付费学员续费率低，缺乏深度服务工具</div>
+        </div>
+      </div>
+      <div class="persona-card">
+        <div class="persona-avatar">👩</div>
+        <div class="persona-name">小美（C端用户）</div>
+        <div class="persona-role">粉丝用户 · 关注多位博主 · 有信息焦虑、决策困难</div>
+        <div class="persona-quote">"我关注的老师讲过这个，但我找不到了，私信又不好意思，怕显得太烦人，但又真的很想知道答案。"</div>
+        <div class="persona-pain">
+          <div class="pain-item">信息散落在不同直播/图文中，找不到</div>
+          <div class="pain-item">无法个性化检索"适合我情况"的内容</div>
+          <div class="pain-item">咨询前缺乏低门槛的信息获取渠道</div>
+          <div class="pain-item">高客单咨询下单决策成本高，不敢轻易付费</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 05 竞品分析 ── -->
+  <section class="section" id="competitor">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <h2>竞品分析</h2>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>产品</th>
+            <th>类型</th>
+            <th>核心能力</th>
+            <th>缺口/不足</th>
+            <th>对KnowGraph的启示</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>FastGPT / Dify</strong></td>
+            <td><span class="tag accent">通用知识库平台</span></td>
+            <td>灵活搭建RAG问答流，开源可部署</td>
+            <td>无多模态视频处理；需技术门槛；不针对博主场景；无图谱可视化</td>
+            <td>我们走"0代码开箱即用"路线，针对小B专属场景</td>
+          </tr>
+          <tr>
+            <td><strong>Coze / 扣子</strong></td>
+            <td><span class="tag accent">AI Agent平台</span></td>
+            <td>工作流+知识库+Bot，微信/飞书可接入</td>
+            <td>通用性太强，无内容图谱化沉淀；博主运营工具属性弱</td>
+            <td>可考虑在Coze生态上构建垂直应用层（Plugin形式）</td>
+          </tr>
+          <tr>
+            <td><strong>字节方舟知识库</strong></td>
+            <td><span class="tag blue">企业知识库</span></td>
+            <td>多模态文档解析，豆包大模型加持</td>
+            <td>定位企业，无博主/IP运营场景；无图谱关系呈现；无微信集成</td>
+            <td>多模态能力可参考，但我们主攻微信生态和IP场景</td>
+          </tr>
+          <tr>
+            <td><strong>Obsidian + 插件</strong></td>
+            <td><span class="tag mid">个人知识管理</span></td>
+            <td>双链笔记+知识图谱可视化，高度灵活</td>
+            <td>纯本地工具，无自动内容采集；无对外分享和问答能力；受众为极客</td>
+            <td>图谱可视化的交互范式值得借鉴；自动构建是差异点</td>
+          </tr>
+          <tr>
+            <td><strong>数字人/AI分身</strong></td>
+            <td><span class="tag accent">IP复制工具</span></td>
+            <td>克隆博主声音形象，24H直播</td>
+            <td>表面克隆，缺乏深度知识图谱支撑；回答质量受限于训练数据</td>
+            <td>知识图谱是"大脑"，数字人是"躯壳"，两者互补</td>
+          </tr>
+          <tr>
+            <td><strong>VideoRAG（学术）</strong></td>
+            <td><span class="tag low">技术框架</span></td>
+            <td>长视频知识图谱构建+多模态检索</td>
+            <td>纯技术框架，无产品化；英文环境为主；无商业闭环</td>
+            <td>技术路线参考，产品化是我们的价值</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight">
+      <strong>竞争空白：</strong>目前市场上没有一款产品同时具备——① 面向博主小B的 <strong>专属运营场景</strong>；② <strong>多模态内容</strong>（视频/音频/图文）自动摄入和图谱化；③ <strong>知识图谱可视化</strong>（Obsidian范式）；④ <strong>微信生态原生分发</strong>。KnowGraph 的机会就在这个交叉口。
+    </div>
+  </section>
+
+  <!-- ── 06 产品定位 ── -->
+  <section class="section" id="product">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <h2>产品定位与核心逻辑</h2>
+    </div>
+
+    <h3>产品定位一句话</h3>
+    <div class="highlight blue">
+      KnowGraph = <strong>内容自动摄入层</strong>（多模态解析）+ <strong>知识图谱构建层</strong>（GraphRAG）+ <strong>智能问答分发层</strong>（微信生态 AI 客服）
+    </div>
+
+    <h3>核心飞轮逻辑</h3>
+    <div class="arch">
+      <div class="arch-label">博主内容飞轮</div>
+      <div class="arch-row">
+        <div class="arch-box accent">博主发布新直播/视频</div>
+        <div class="arch-box accent">系统自动解析摄入</div>
+        <div class="arch-box accent">图谱节点自动扩充</div>
+      </div>
+      <div class="arch-arrow">↓ 图谱越来越完备 ↓</div>
+      <div class="arch-row">
+        <div class="arch-box green">用户在微信问图谱AI</div>
+        <div class="arch-box green">AI基于图谱精准回答</div>
+        <div class="arch-box green">满意用户转化付费咨询</div>
+      </div>
+      <div class="arch-arrow">↓ 博主收益提升 → 持续投入内容 ↓</div>
+      <div class="arch-row">
+        <div class="arch-box blue">用户问答数据反馈给博主</div>
+        <div class="arch-box blue">博主发现内容缺口</div>
+        <div class="arch-box blue">定向补充高需求内容</div>
+      </div>
+    </div>
+
+    <h3>与 Obsidian 的类比</h3>
+    <p>Obsidian 让个人笔记形成双链知识图谱，KnowGraph 做的是把<strong>博主的直播/视频内容</strong>自动变成"双链"——每场直播里的概念、观点、案例自动成为图谱节点，节点之间根据语义关系自动连线，最终形成一张可交互的<strong>专场知识地图</strong>。</p>
+  </section>
+
+  <!-- ── 07 核心功能 ── -->
+  <section class="section" id="features">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <h2>核心功能规划</h2>
+    </div>
+
+    <h3>功能模块全景</h3>
+
+    <div class="card">
+      <h4>模块 A · 多模态内容摄入引擎</h4>
+      <ul class="feature-list">
+        <li><span class="check">✓</span><div><strong>视频/直播回放摄入：</strong>支持上传直播录屏/视频号回放，自动转录语音（ASR），提取字幕、关键帧、画面文字（OCR），生成结构化章节摘要。</div></li>
+        <li><span class="check">✓</span><div><strong>图文内容摄入：</strong>微信公众号文章、小红书笔记、PDF文档一键导入，自动解析段落结构和核心概念。</div></li>
+        <li><span class="check">✓</span><div><strong>微信视频号 API 联动：</strong>授权后自动同步新发布内容，无需手动上传。（依赖微信视频号开放平台能力）</div></li>
+        <li><span class="check">✓</span><div><strong>增量更新：</strong>每次新内容发布自动触发图谱扩充，已存在的节点自动关联补充。</div></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h4>模块 B · GraphRAG 知识图谱构建</h4>
+      <ul class="feature-list">
+        <li><span class="check">✓</span><div><strong>垂类专属实体识别：</strong>留学（学校/专业/申请材料/时间节点）、职场（技能/岗位/公司/晋升方法论）、电商（品牌/成分/选品逻辑）分别预置专业词库，提升图谱准确率。</div></li>
+        <li><span class="check">✓</span><div><strong>关系推断：</strong>基于大模型推断节点间关系（A学校 → 要求 → B背景；C策略 → 适用于 → D情形），自动建立有向边。</div></li>
+        <li><span class="check">✓</span><div><strong>内容来源溯源：</strong>每个节点可点击查看来源（哪场直播的第几分钟）。</div></li>
+        <li><span class="check">✓</span><div><strong>图谱可视化（Obsidian 风格）：</strong>博主端可查看完整知识图谱，支持节点筛选、关系过滤、聚类视图。</div></li>
+        <li><span class="check">✓</span><div><strong>多专场串联：</strong>同一博主不同主题的专场（选校策略、文书写作、签证流程）之间的跨场关联自动发现和连接。</div></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h4>模块 C · AI 问答智能体（面向 C 端用户）</h4>
+      <ul class="feature-list">
+        <li><span class="check">✓</span><div><strong>微信服务号/视频号小店 AI 客服接入：</strong>用户在微信侧即可发起对话，无需跳转外部 App。</div></li>
+        <li><span class="check">✓</span><div><strong>基于图谱的精准问答：</strong>不是通用大模型泛回答，而是基于博主自身内容图谱的有依据回答，答案附带"来源：XX直播第X分钟"。</div></li>
+        <li><span class="check">✓</span><div><strong>个性化追问：</strong>支持用户描述自身情况（GPA/背景/目标），AI 给出针对性的图谱路径推荐。</div></li>
+        <li><span class="check">✓</span><div><strong>智能升级引导：</strong>当问题超出图谱已有知识范围时，AI 主动引导用户预约博主的付费咨询，并提供场景化的转化话术。</div></li>
+        <li><span class="check">✓</span><div><strong>白标品牌化：</strong>C端用户看到的是"[博主名]AI助理"，非 KnowGraph 品牌露出。</div></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h4>模块 D · 博主运营控制台</h4>
+      <ul class="feature-list">
+        <li><span class="check">✓</span><div><strong>内容管理：</strong>上传、标注、管理所有已摄入内容，支持手动修正图谱中的误识别节点或关系。</div></li>
+        <li><span class="check">✓</span><div><strong>问答数据洞察：</strong>用户高频问了什么？哪些问题图谱答不上来？内容缺口热力图，指导博主选题。</div></li>
+        <li><span class="check">✓</span><div><strong>转化漏斗看板：</strong>从图谱咨询 → 付费意向 → 成交的完整数据追踪。</div></li>
+        <li><span class="check">✓</span><div><strong>图谱发布管理：</strong>控制哪些图谱内容对外公开，哪些需要付费解锁，哪些仅限私信用户可见。</div></li>
+      </ul>
+    </div>
+
+    <h3>MVP 功能范围（v1.0）</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>功能</th><th>MVP</th><th>v1.5</th><th>v2.0</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>视频/直播转录 + 章节摘要</td><td><span class="tag low">✓ 包含</span></td><td></td><td></td></tr>
+          <tr><td>图文文档摄入（PDF/公众号）</td><td><span class="tag low">✓ 包含</span></td><td></td><td></td></tr>
+          <tr><td>基础知识图谱构建（实体+关系）</td><td><span class="tag low">✓ 包含</span></td><td></td><td></td></tr>
+          <tr><td>图谱可视化（博主端）</td><td><span class="tag low">✓ 包含</span></td><td></td><td></td></tr>
+          <tr><td>微信服务号 AI 问答接入</td><td><span class="tag low">✓ 包含</span></td><td></td><td></td></tr>
+          <tr><td>来源溯源（答案附直播时间戳）</td><td><span class="tag low">✓ 包含</span></td><td></td><td></td></tr>
+          <tr><td>高频问题洞察看板</td><td><span class="tag low">✓ 包含</span></td><td></td><td></td></tr>
+          <tr><td>微信视频号 API 自动同步</td><td></td><td><span class="tag mid">v1.5</span></td><td></td></tr>
+          <tr><td>多专场跨场图谱关联</td><td></td><td><span class="tag mid">v1.5</span></td><td></td></tr>
+          <tr><td>付费解锁图谱节点</td><td></td><td><span class="tag mid">v1.5</span></td><td></td></tr>
+          <tr><td>转化漏斗完整追踪</td><td></td><td><span class="tag mid">v1.5</span></td><td></td></tr>
+          <tr><td>多模态问答（图片识别+提问）</td><td></td><td></td><td><span class="tag accent">v2.0</span></td></tr>
+          <tr><td>数字人 AI 分身集成</td><td></td><td></td><td><span class="tag accent">v2.0</span></td></tr>
+          <tr><td>开放 API / 插件市场</td><td></td><td></td><td><span class="tag accent">v2.0</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 08 用户旅程 ── -->
+  <section class="section" id="userflow">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <h2>用户旅程</h2>
+    </div>
+
+    <h3>B端（博主）旅程</h3>
+    <div class="journey">
+      <div class="journey-step">
+        <div class="journey-icon">📝</div>
+        <div class="journey-label">注册开户</div>
+        <div class="journey-action">填写博主信息 · 绑定视频号</div>
+      </div>
+      <div class="journey-step">
+        <div class="journey-icon">📤</div>
+        <div class="journey-label">上传内容</div>
+        <div class="journey-action">传直播录像/图文 · 设置专场</div>
+      </div>
+      <div class="journey-step">
+        <div class="journey-icon">⚙️</div>
+        <div class="journey-label">图谱生成</div>
+        <div class="journey-action">AI解析 · 图谱自动构建 · 人工校正</div>
+      </div>
+      <div class="journey-step">
+        <div class="journey-icon">🔌</div>
+        <div class="journey-label">接入微信</div>
+        <div class="journey-action">扫码授权 · 生成AI助理链接</div>
+      </div>
+      <div class="journey-step">
+        <div class="journey-icon">📊</div>
+        <div class="journey-label">运营洞察</div>
+        <div class="journey-action">查看高频问题 · 优化内容选题</div>
+      </div>
+      <div class="journey-step">
+        <div class="journey-icon">💰</div>
+        <div class="journey-label">收益提升</div>
+        <div class="journey-action">AI首筛 → 博主接单高价咨询</div>
+      </div>
+    </div>
+
+    <h3>C端（粉丝用户）旅程</h3>
+    <div class="journey">
+      <div class="journey-step">
+        <div class="journey-icon">📱</div>
+        <div class="journey-label">发现入口</div>
+        <div class="journey-action">视频号主页 · 服务号菜单 · 分享链接</div>
+      </div>
+      <div class="journey-step">
+        <div class="journey-icon">💬</div>
+        <div class="journey-label">开始对话</div>
+        <div class="journey-action">微信内直接提问</div>
+      </div>
+      <div class="journey-step">
+        <div class="journey-icon">🗺️</div>
+        <div class="journey-label">图谱导航</div>
+        <div class="journey-action">按主题浏览知识图谱</div>
+      </div>
+      <div class="journey-step">
+        <div class="journey-icon">🔍</div>
+        <div class="journey-label">精准检索</div>
+        <div class="journey-action">输入自身情况 · 获取个性化解答</div>
+      </div>
+      <div class="journey-step">
+        <div class="journey-icon">🤝</div>
+        <div class="journey-label">升级咨询</div>
+        <div class="journey-action">遇到个性化深度问题 · AI引导预约博主</div>
+      </div>
+      <div class="journey-step">
+        <div class="journey-icon">⭐</div>
+        <div class="journey-label">沉淀用户</div>
+        <div class="journey-action">关注服务号 · 进入私域社群</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 09 技术架构 ── -->
+  <section class="section" id="tech">
+    <div class="section-header">
+      <div class="section-num">09</div>
+      <h2>技术架构概览</h2>
+    </div>
+
+    <div class="arch">
+      <div class="arch-label">系统分层架构</div>
+
+      <div class="arch-label" style="color:var(--accent3);margin-top:0">【接入层】</div>
+      <div class="arch-row">
+        <div class="arch-box blue">微信服务号 / 视频号</div>
+        <div class="arch-box blue">Web 控制台</div>
+        <div class="arch-box blue">开放 API（未来）</div>
+      </div>
+      <div class="arch-arrow">↓</div>
+
+      <div class="arch-label" style="color:var(--green)">【应用层】</div>
+      <div class="arch-row">
+        <div class="arch-box green">AI 问答智能体</div>
+        <div class="arch-box green">博主控制台</div>
+        <div class="arch-box green">图谱可视化引擎</div>
+        <div class="arch-box green">运营洞察看板</div>
+      </div>
+      <div class="arch-arrow">↓</div>
+
+      <div class="arch-label" style="color:var(--accent)">【知识图谱层】</div>
+      <div class="arch-row">
+        <div class="arch-box accent">GraphRAG 引擎</div>
+        <div class="arch-box accent">实体关系存储（图数据库 Neo4j/TuGraph）</div>
+        <div class="arch-box accent">向量索引（Milvus / Qdrant）</div>
+      </div>
+      <div class="arch-arrow">↓</div>
+
+      <div class="arch-label" style="color:var(--yellow)">【多模态解析层】</div>
+      <div class="arch-row">
+        <div class="arch-box" style="border-color:var(--yellow);background:rgba(245,158,11,0.07);color:var(--yellow);font-weight:600">ASR 语音转录</div>
+        <div class="arch-box" style="border-color:var(--yellow);background:rgba(245,158,11,0.07);color:var(--yellow);font-weight:600">视频关键帧提取</div>
+        <div class="arch-box" style="border-color:var(--yellow);background:rgba(245,158,11,0.07);color:var(--yellow);font-weight:600">OCR 文字识别</div>
+        <div class="arch-box" style="border-color:var(--yellow);background:rgba(245,158,11,0.07);color:var(--yellow);font-weight:600">多模态 Embedding</div>
+      </div>
+      <div class="arch-arrow">↓</div>
+
+      <div class="arch-label">【内容接入层】</div>
+      <div class="arch-row">
+        <div class="arch-box">视频/直播上传</div>
+        <div class="arch-box">图文/PDF 导入</div>
+        <div class="arch-box">视频号 API 自动同步</div>
+      </div>
+    </div>
+
+    <h3>关键技术选型</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>模块</th><th>推荐技术方案</th><th>备选方案</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>语音转录 (ASR)</td><td>OpenAI Whisper Large-v3 / 阿里云 ASR</td><td>腾讯云 ASR</td></tr>
+          <tr><td>多模态解析</td><td>ColQwen2 / GPT-4o Vision</td><td>Qwen-VL</td></tr>
+          <tr><td>GraphRAG 框架</td><td>Microsoft GraphRAG + 自定义中文优化</td><td>LightRAG</td></tr>
+          <tr><td>图数据库</td><td>TuGraph（腾讯开源）</td><td>Neo4j Community</td></tr>
+          <tr><td>向量数据库</td><td>Milvus / Qdrant</td><td>腾讯云向量数据库</td></tr>
+          <tr><td>大模型</td><td>GPT-4o / Deepseek-V3（可切换）</td><td>Qwen-Max</td></tr>
+          <tr><td>图谱可视化</td><td>Cytoscape.js / D3.js Force</td><td>AntV G6</td></tr>
+          <tr><td>后端框架</td><td>Python FastAPI + 腾讯云容器</td><td>Node.js</td></tr>
+          <tr><td>微信集成</td><td>微信开放平台 服务号 API + 视频号开放接口</td><td>Coze Plugin</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight yellow">
+      <strong>技术风险提示：</strong>微信视频号对第三方 API 的开放程度仍有限制，MVP 阶段可先走"用户手动上传直播视频"路径，视频号自动同步作为 v1.5 目标，待官方接口成熟后接入。
+    </div>
+  </section>
+
+  <!-- ── 10 迭代路线 ── -->
+  <section class="section" id="roadmap">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <h2>迭代路线图</h2>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-phase">Phase 0 · 0-2个月</div>
+        <div class="timeline-title">概念验证（Proof of Concept）</div>
+        <div class="timeline-desc">精准招募 3-5 位<strong>留学博主</strong>种子用户（冷启动首发垂类）。手动搭建 MVP Demo：上传 2-3 场直播 → 生成图谱 → 微信接入测试。验证核心假设：① 博主认为省时有价值；② 用户问答满意度 ≥ 70%。</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-phase">Phase 1 · 3-5个月</div>
+        <div class="timeline-title">MVP 发布（内测）</div>
+        <div class="timeline-desc">完成多模态内容摄入引擎、基础 GraphRAG 图谱、微信 AI 问答接入、博主管理控制台。内测 20-30 位博主（留学为主，少量职场博主试点），目标：每位博主图谱节点 ≥ 200，用户问答日活 ≥ 50。</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-phase">Phase 2 · 6-9个月</div>
+        <div class="timeline-title">商业化起步 + 职场垂类扩展</div>
+        <div class="timeline-desc">推出订阅制收费（Starter/Pro）；正式上线<strong>职场/技能培训垂类</strong>（专属词库+图谱模板+职场场景问答优化）；上线多专场跨场图谱关联、运营洞察看板、付费图谱解锁功能；目标 ARR ≥ 50 万。</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-phase">Phase 3 · 10-18个月</div>
+        <div class="timeline-title">规模化增长 + 电商垂类</div>
+        <div class="timeline-desc">接入视频号 API 自动同步；扩展<strong>直播电商达人垂类</strong>（话术模块+选品知识库）；上线数字人 AI 分身集成；构建博主生态社区和跨垂类模板市场；目标月活博主 ≥ 1,000。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 11 商业模式 ── -->
+  <section class="section" id="biz">
+    <div class="section-header">
+      <div class="section-num">11</div>
+      <h2>商业模式</h2>
+    </div>
+
+    <h3>定价策略</h3>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-name">Starter 入门版</div>
+        <div class="pricing-price"><sup>¥</sup>299</div>
+        <div class="pricing-unit">/ 月</div>
+        <ul class="pricing-features">
+          <li>最多 20 小时视频摄入/月</li>
+          <li>图谱节点上限 500 个</li>
+          <li>微信 AI 问答接入（1个服务号）</li>
+          <li>基础运营洞察</li>
+          <li>邮件客服支持</li>
+        </ul>
+      </div>
+      <div class="pricing-card featured">
+        <div class="pricing-name">Pro 专业版 ⭐ 推荐</div>
+        <div class="pricing-price"><sup>¥</sup>899</div>
+        <div class="pricing-unit">/ 月</div>
+        <ul class="pricing-features">
+          <li>无限视频摄入</li>
+          <li>图谱节点无上限</li>
+          <li>多专场跨场图谱关联</li>
+          <li>完整转化漏斗追踪</li>
+          <li>付费图谱解锁功能</li>
+          <li>优先响应客服 + 专属对接</li>
+        </ul>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-name">Agency 机构版</div>
+        <div class="pricing-price"><sup>¥</sup>定制</div>
+        <div class="pricing-unit">/ 年 · 联系商务</div>
+        <ul class="pricing-features">
+          <li>多博主账号管理（≥5）</li>
+          <li>私有化部署选项</li>
+          <li>白标品牌完全定制</li>
+          <li>数据导出 API</li>
+          <li>专属 SLA 服务</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>增值收入来源</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title">🎯 图谱付费解锁</div>
+        <div class="card-desc">博主可设定部分高价值图谱节点为付费可见（9.9-99元），平台抽佣 20%。</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🤝 咨询预约中间层</div>
+        <div class="card-desc">AI 引导用户预约付费咨询，平台可提供日历+支付整合，成交后抽佣 5%。</div>
+      </div>
+      <div class="card">
+        <div class="card-title">📦 模板市场</div>
+        <div class="card-desc">头部博主可出售自己的图谱模板（行业知识框架），平台分成 30%。</div>
+      </div>
+    </div>
+
+    <h3>获客策略</h3>
+    <div class="highlight">
+      <strong>冷启动策略（Phase 0）：</strong>精准锁定微信视频号<strong>留学赛道</strong> Top 100 博主，直接 DM 私信，提供免费 3 个月 Pro 体验。成功转化的博主自然成为"展示案例"——其粉丝用户会主动向其他博主推荐，形成同圈层传播。
+    </div>
+    <div class="highlight green">
+      <strong>Phase 2 扩展策略：</strong>以留学博主的成功案例为背书，向<strong>职场/技能博主</strong>圈层渗透。制作"某留学博主每月节省40小时"的数据案例，在职场博主微信群/知识付费社群精准投放。职场赛道博主社区聚合程度更高，口碑传播效率更快。
+    </div>
+  </section>
+
+  <!-- ── 12 风险评估 ── -->
+  <section class="section" id="risk">
+    <div class="section-header">
+      <div class="section-num">12</div>
+      <h2>风险评估与应对</h2>
+    </div>
+
+    <div class="risk-row">
+      <div class="risk-card">
+        <div class="risk-level"><span class="tag high">高风险</span></div>
+        <div class="risk-title">微信生态政策限制</div>
+        <div class="risk-desc">微信对第三方接入服务号、小程序有严格审核，视频号 API 开放进度不可控。</div>
+        <div class="risk-counter">应对：MVP先走服务号+手动上传路径；同步布局小红书私信机器人作为备用渠道</div>
+      </div>
+      <div class="risk-card">
+        <div class="risk-level"><span class="tag high">高风险</span></div>
+        <div class="risk-title">内容版权与隐私合规</div>
+        <div class="risk-desc">摄入博主内容后的知识产权归属、用户对话数据隐私处理需合规。</div>
+        <div class="risk-counter">应对：明确合同声明内容版权归博主；数据不用于训练第三方模型；通过 ICP 备案</div>
+      </div>
+      <div class="risk-card">
+        <div class="risk-level"><span class="tag mid">中风险</span></div>
+        <div class="risk-title">图谱质量不达预期</div>
+        <div class="risk-desc">GraphRAG 中文识别精度、专业领域知识实体抽取可能存在偏差，影响回答质量。</div>
+        <div class="risk-counter">应对：提供博主"人工校正"工具；针对留学垂类预置专业词库；持续RLHF优化</div>
+      </div>
+      <div class="risk-card">
+        <div class="risk-level"><span class="tag mid">中风险</span></div>
+        <div class="risk-title">博主侧使用门槛</div>
+        <div class="risk-desc">目标用户是"小B"，技术接受能力有限，复杂操作可能导致流失。</div>
+        <div class="risk-counter">应对：强调"0代码"；提供免费内容摄入代运营服务（前3场直播由我们帮着上传）</div>
+      </div>
+      <div class="risk-card">
+        <div class="risk-level"><span class="tag low">低风险</span></div>
+        <div class="risk-title">大平台复制</div>
+        <div class="risk-desc">腾讯/字节等大厂可能在内部直接推出类似功能，挤压独立 SaaS 生存空间。</div>
+        <div class="risk-counter">应对：深耕垂直场景、强化博主社区网络效应、提前锁定头部博主长期合约</div>
+      </div>
+      <div class="risk-card">
+        <div class="risk-level"><span class="tag low">低风险</span></div>
+        <div class="risk-title">AI 幻觉损害博主声誉</div>
+        <div class="risk-desc">AI 在博主名义下给出错误建议，可能影响博主信誉。</div>
+        <div class="risk-counter">应对：回答必须附溯源引用；超出图谱范围的问题明确标注"博主暂未覆盖此话题"</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 13 成功指标 ── -->
+  <section class="section" id="success">
+    <div class="section-header">
+      <div class="section-num">13</div>
+      <h2>成功指标 (OKR)</h2>
+    </div>
+
+    <h3>Phase 1 MVP 阶段（3-5个月）</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>指标</th><th>目标值</th><th>衡量方式</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>种子博主数</td><td>≥ 20 位</td><td>注册并完成首次图谱构建</td></tr>
+          <tr><td>图谱问答用户月活（MAU）</td><td>≥ 500</td><td>每月与 AI 助理发生对话的独立微信用户</td></tr>
+          <tr><td>博主月留存率</td><td>≥ 70%</td><td>30天内回访并更新内容的比例</td></tr>
+          <tr><td>问答满意率</td><td>≥ 75%</td><td>用户对回答"有帮助"的点赞率</td></tr>
+          <tr><td>内容→咨询转化率</td><td>≥ 5%</td><td>图谱问答后点击"预约咨询"的比例</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Phase 2 商业化阶段（6-9个月）</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>指标</th><th>目标值</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>付费博主数</td><td>≥ 50</td></tr>
+          <tr><td>月经常性收入（MRR）</td><td>≥ ¥40,000</td></tr>
+          <tr><td>NPS 净推荐值</td><td>≥ 40</td></tr>
+          <tr><td>平均每博主带动的月度 C 端活跃用户</td><td>≥ 200</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight green">
+      <strong>北极星指标：</strong>"博主借助 KnowGraph 每月节省的咨询时间 × 对应时间价值"——这个数字体现了产品的核心价值，也是最有力的销售素材。目标 Phase 1 结束时，平均每位博主月均节省 ≥ 10 小时咨询时间。
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div style="border-top:1px solid var(--border);padding-top:24px;margin-top:20px;text-align:center;">
+    <p style="font-size:12px;color:var(--muted);">KnowGraph PRD v0.2 · 本文档为早期概念阶段草稿，目标市场扩展至留学/职场/技能培训/电商多垂类 · 生成时间 2026-03-31</p>
+  </div>
+
+</main>
+</div>
+
+</body>
+</html>
